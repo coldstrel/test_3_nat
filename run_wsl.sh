@@ -10,7 +10,7 @@ fix_crlf() {
 }
 
 fix_crlf "./run.sh"
-fix_crlf "./run_streamlit.sh"
+fix_crlf "./run_wsl.sh"
 
 chmod +x ./run.sh
 exec ./run.sh

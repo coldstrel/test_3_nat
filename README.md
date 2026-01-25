@@ -8,31 +8,21 @@ This repo is a small **Reproducible Analytical Pipeline (RAP)** that:
 5) writes **outputs** (tables + figures + a short report).
 
 ## One-command run
-Linux/macOS/WSL:
+Linux/macOS/WSL (or Windows with Git Bash):
 ```bash
 ./run.sh
 ```
 This creates a local virtualenv, installs `requirements.txt`, runs the pipeline,
-and starts Streamlit in the background.
+and writes outputs.
 
 If you are on WSL and see a `bash\r` error, run:
 ```bash
 ./run_wsl.sh
 ```
 
-Windows (PowerShell or CMD):
+Windows (PowerShell or CMD, if you don't use Git Bash/WSL):
 ```bat
 run.cmd
-```
-
-## Streamlit app
-```bash
-streamlit run app.py
-```
-
-Or on Linux/macOS/WSL with venv:
-```bash
-./run_streamlit.sh
 ```
 
 ## Outputs (generated)

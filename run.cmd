@@ -1,6 +1,8 @@
 @echo off
 setlocal
 
+echo === Bike RAP runner (Windows) ===
+
 REM Prefer python3 if available, fall back to python
 where python3 >nul 2>nul
 if %ERRORLEVEL%==0 (
@@ -16,17 +18,16 @@ if NOT %ERRORLEVEL%==0 (
 )
 
 if not exist ".venv\Scripts\python.exe" (
+  echo Creating virtualenv...
   %PYTHON% -m venv .venv
 )
 
 call .venv\Scripts\activate.bat
+echo Installing dependencies...
 pip install -r requirements.txt
 
+echo Running pipeline...
 python src\pipeline.py
 
 echo OK Pipeline executed.
-echo Starting Streamlit in background...
-start "" /B .venv\Scripts\python.exe -m streamlit run app.py > streamlit.log 2>&1
-echo Streamlit log: streamlit.log
-echo Open: http://localhost:8501
 echo Check: outputs/, reports/, data/processed/
