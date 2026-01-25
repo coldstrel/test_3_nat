@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import os
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -18,12 +19,18 @@ def venv_python() -> Path:
 
 
 def ensure_venv() -> None:
+    if VENV_DIR.exists() and not venv_python().exists():
+        # Repair a broken/partial venv.
+        shutil.rmtree(VENV_DIR)
     if not VENV_DIR.exists():
-        subprocess.check_call([sys.executable, "-m", "venv", str(VENV_DIR)])
+        subprocess.check_call([sys.executable, "-m", "venv", str(VENV_DIR)], cwd=ROOT)
 
 
 def install_requirements() -> None:
-    subprocess.check_call([str(venv_python()), "-m", "pip", "install", "-r", "requirements.txt"])
+    subprocess.check_call(
+        [str(venv_python()), "-m", "pip", "install", "-r", "requirements.txt"],
+        cwd=ROOT,
+    )
 
 
 def run_pipeline() -> None:
@@ -52,11 +59,18 @@ def main() -> None:
     ensure_venv()
     install_requirements()
 
-    if args.pipeline_only or not args.streamlit and not args.streamlit_bg:
+    if args.pipeline_only:
         run_pipeline()
+    elif args.streamlit:
+        run_pipeline()
+        run_streamlit(background=False)
+    elif args.streamlit_bg:
+        run_pipeline()
+        run_streamlit(background=True)
     else:
+        # Default: run pipeline and start Streamlit in background.
         run_pipeline()
-        run_streamlit(background=args.streamlit_bg)
+        run_streamlit(background=True)
 
 
 if __name__ == "__main__":

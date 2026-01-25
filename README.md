@@ -11,7 +11,13 @@ This repo is a small **Reproducible Analytical Pipeline (RAP)** that:
 ```bash
 python run.py
 ```
-This creates a local virtualenv and installs `requirements.txt`.
+This creates a local virtualenv, installs `requirements.txt`, runs the pipeline,
+and starts Streamlit in the background.
+
+Windows (PowerShell or CMD):
+```bat
+run.cmd
+```
 
 ## Streamlit app
 ```bash
@@ -35,6 +41,6 @@ streamlit run app.py
 ## Notes
 - Default is **hour-level** (`hour.csv`). If you want day-level instead:
   ```bash
-  BIKE_LEVEL=day ./run.sh
+  BIKE_LEVEL=day python run.py
   ```
 - Downloaded data is stored in `data/raw/` (not committed).
