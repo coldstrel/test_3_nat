@@ -7,23 +7,28 @@ This repo is a small **Reproducible Analytical Pipeline (RAP)** that:
 4) trains a fast baseline model,
 5) writes **outputs** (tables + figures + a short report).
 
-## One-command run
-Linux/macOS/WSL (or Windows with Git Bash):
-```bash
-./run.sh
-```
-This creates a local virtualenv, installs `requirements.txt`, runs the pipeline,
-and writes outputs.
+## Reproducibility
+- **Python Version**: Specified in `.python-version` (pinned to 3.12.7). Supports Python 3.10 to 3.13.
+- **Dependencies**: Locked in `requirements.lock` for exact environments.
+- **Makefile**: Provides a standard interface for reproducibility on Unix systems.
 
-If you are on WSL and see a `bash\r` error, run:
+## Quick Start (Unix/macOS/WSL)
+If you have `make` installed:
 ```bash
-./run_wsl.sh
+make
 ```
+This will install dependencies and run the pipeline. You can also use `make test` or `make clean`.
 
-Windows (PowerShell or CMD, if you don't use Git Bash/WSL):
-```bat
-run.cmd
+## One-command run (All Platforms)
+If you don't have `make` or are on Windows:
+```bash
+python run.py
 ```
+This script automatically:
+1. Detects and uses a compatible Python version (avoids 3.14 alpha).
+2. Creates a local virtual environment (`.venv` or `.venv-win`).
+3. Installs dependencies from `requirements.lock`.
+4. Runs the analysis pipeline.
 
 ## Outputs (generated)
 - `outputs/metrics.txt` (RMSE / R²)
@@ -37,6 +42,6 @@ run.cmd
 ## Notes
 - Default is **hour-level** (`hour.csv`). If you want day-level instead:
   ```bash
-  BIKE_LEVEL=day ./run.sh
+  BIKE_LEVEL=day python run.py
   ```
 - Downloaded data is stored in `data/raw/` (not committed).
