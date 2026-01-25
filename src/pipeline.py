@@ -45,23 +45,6 @@ sys.path.insert(0, str(ROOT))
 from utils import ensure_ucibike_data
 
 
-def _env_info(bike_level: str) -> dict:
-    """Collect a tiny environment snapshot for reproducibility/debugging."""
-    import sklearn  # local import to read version
-
-    return {
-        "timestamp": datetime.now().isoformat(timespec="seconds"),
-        "python": sys.version,
-        "platform": platform.platform(),
-        "numpy": np.__version__,
-        "pandas": pd.__version__,
-        "sklearn": sklearn.__version__,
-        "matplotlib": matplotlib.__version__,
-        "requests": requests.__version__,
-        "BIKE_LEVEL": bike_level,
-    }
-
-
 def main() -> None:
     BIKE_LEVEL = os.getenv("BIKE_LEVEL", "hour").strip().lower()
     if BIKE_LEVEL not in {"hour", "day"}:
@@ -75,9 +58,6 @@ def main() -> None:
 
     for d in [raw_dir, processed_dir, outputs_dir, reports_dir]:
         d.mkdir(parents=True, exist_ok=True)
-
-    # --- 0) Save environment snapshot ---
-    (outputs_dir / "env.json").write_text(json.dumps(_env_info(BIKE_LEVEL), indent=2), encoding="utf-8")
 
     # --- 1) Download / extract dataset ---
     csv_path = ensure_ucibike_data(raw_dir=raw_dir, level=BIKE_LEVEL)  # creates data/raw/bike_sharing_dataset.zip + CSV
@@ -108,11 +88,11 @@ def main() -> None:
         plt.colorbar(label="avg cnt")
         plt.xlabel("hour (hr)")
         plt.ylabel("month (mnth)")
-        plt.title("Heatmap: average rentals by month x hour")
+        plt.title(f"Heatmap: average rentals by month x hour ({BIKE_LEVEL})")
         plt.xticks(range(0, pivot.shape[1], 2), range(0, 24, 2))
         plt.yticks(range(pivot.shape[0]), pivot.index.tolist())
         plt.tight_layout()
-        plt.savefig(outputs_dir / "fig_heatmap_month_hour.png", dpi=160)
+        plt.savefig(outputs_dir / f"{BIKE_LEVEL}_fig_heatmap_month_hour.png", dpi=160)
         plt.close()
 
     # 3.2 Timeseries: daily total rentals
@@ -122,9 +102,9 @@ def main() -> None:
         plt.plot(daily["dteday"], daily["cnt"])
         plt.xlabel("date")
         plt.ylabel("total cnt")
-        plt.title("Daily rentals over time")
+        plt.title(f"Daily rentals over time ({BIKE_LEVEL})")
         plt.tight_layout()
-        plt.savefig(outputs_dir / "fig_timeseries.png", dpi=160)
+        plt.savefig(outputs_dir / f"{BIKE_LEVEL}_fig_timeseries.png", dpi=160)
         plt.close()
 
     # 3.3 Scatter: temp vs cnt
@@ -133,9 +113,9 @@ def main() -> None:
         plt.scatter(df["temp"], df["cnt"], s=8, alpha=0.35)
         plt.xlabel("temp (normalized)")
         plt.ylabel("cnt")
-        plt.title("Temp vs rentals")
+        plt.title(f"Temp vs rentals ({BIKE_LEVEL})")
         plt.tight_layout()
-        plt.savefig(outputs_dir / "fig_temp_vs_cnt.png", dpi=160)
+        plt.savefig(outputs_dir / f"{BIKE_LEVEL}_fig_temp_vs_cnt.png", dpi=160)
         plt.close()
 
     # 3.4 Average by hour curve
@@ -145,14 +125,14 @@ def main() -> None:
         plt.plot(avg_by_hr["hr"], avg_by_hr["avg_cnt"])
         plt.xlabel("hour (hr)")
         plt.ylabel("average cnt")
-        plt.title("Average rentals by hour")
+        plt.title(f"Average rentals by hour ({BIKE_LEVEL})")
         plt.xticks(range(0, 24, 2))
         plt.tight_layout()
-        plt.savefig(outputs_dir / "fig_avg_by_hour.png", dpi=160)
+        plt.savefig(outputs_dir / f"{BIKE_LEVEL}_fig_avg_by_hour.png", dpi=160)
         plt.close()
 
     # --- 4) Peak hours by day type (table + extra figure) ---
-    peak_path = outputs_dir / "peak_hours.csv"
+    peak_path = outputs_dir / f"{BIKE_LEVEL}_peak_hours.csv"
     peak_top = pd.DataFrame()
 
     if "hr" in df.columns:
@@ -181,20 +161,20 @@ def main() -> None:
             plt.plot(tmp["hr"], tmp["avg_cnt"], label=daytype)
         plt.xlabel("hour (hr)")
         plt.ylabel("average cnt")
-        plt.title("Average rentals by hour (split by day type)")
+        plt.title(f"Average rentals by hour split by day type ({BIKE_LEVEL})")
         plt.xticks(range(0, 24, 2))
         plt.legend()
         plt.tight_layout()
-        plt.savefig(outputs_dir / "fig_avg_by_hour_daytype.png", dpi=160)
+        plt.savefig(outputs_dir / f"{BIKE_LEVEL}_fig_avg_by_hour_daytype.png", dpi=160)
         plt.close()
 
         df.drop(columns=["_daytype"], inplace=True, errors="ignore")
     else:
-        peak_top = pd.DataFrame({"note": ["No 'hr' column found (day-level). Peak-hour analysis skipped."]})
+        peak_top = pd.DataFrame({"note": [f"No 'hr' column found ({BIKE_LEVEL}-level). Peak-hour analysis skipped."]})
         peak_top.to_csv(peak_path, index=False)
 
     # Human-readable peak-hours text
-    summary_txt = outputs_dir / "peak_hours_summary.txt"
+    summary_txt = outputs_dir / f"{BIKE_LEVEL}_peak_hours_summary.txt"
     if "_daytype" in peak_top.columns and not peak_top.empty:
         out_lines: list[str] = []
         for dt in peak_top["_daytype"].unique():
@@ -205,10 +185,10 @@ def main() -> None:
             out_lines.append("")
         summary_txt.write_text("\n".join(out_lines).strip() + "\n", encoding="utf-8")
     else:
-        summary_txt.write_text("No peak-hour summary available for day-level dataset.\n", encoding="utf-8")
+        summary_txt.write_text(f"No peak-hour summary available for {BIKE_LEVEL}-level dataset.\n", encoding="utf-8")
 
     # --- 5) Summary table (by season if available) ---
-    summary_path = outputs_dir / "summary.csv"
+    summary_path = outputs_dir / f"{BIKE_LEVEL}_summary.csv"
     if "cnt" in df.columns:
         if "season" in df.columns:
             summary = (
@@ -224,8 +204,8 @@ def main() -> None:
         summary.to_csv(summary_path, index=False)
 
     # --- 6) Baseline models (Ridge + RandomForest comparison) ---
-    metrics_path = outputs_dir / "metrics.txt"
-    comp_path = outputs_dir / "model_comparison.csv"
+    metrics_path = outputs_dir / f"{BIKE_LEVEL}_metrics.txt"
+    comp_path = outputs_dir / f"{BIKE_LEVEL}_model_comparison.csv"
 
     if "cnt" in df.columns:
         drop_cols = {"cnt", "casual", "registered", "instant", "dteday"}
@@ -301,9 +281,9 @@ def main() -> None:
         pd.DataFrame(results).sort_values("rmse").to_csv(comp_path, index=False)
 
     # --- 7) Mini report (Markdown) ---
-    report_path = reports_dir / "REPORT.md"
+    report_path = reports_dir / f"{BIKE_LEVEL}_REPORT.md"
     report_path.write_text(
-        f"""# Bike-sharing demand — peak hours (auto report)
+        f"""# Bike-sharing demand — peak hours (auto report: {BIKE_LEVEL})
 
 This report is generated by `src/pipeline.py`.
 
@@ -313,44 +293,43 @@ Which **hours** are the peak-demand hours, and do they differ between **workingd
 ## What I did 
 - Downloaded the UCI Bike Sharing Dataset (`{BIKE_LEVEL}.csv`).
 - Built an `is_weekend` feature from `weekday`.
-- Produced peak-hours outputs (`outputs/peak_hours.csv`) and EDA plots (`outputs/fig_*.png`).
+- Produced peak-hours outputs (`outputs/{BIKE_LEVEL}_peak_hours.csv`) and EDA plots (`outputs/{BIKE_LEVEL}_fig_*.png`).
 - Trained a baseline model (Ridge regression) and compared it with a RandomForest model.
 
 ## Key artefacts
-- Environment snapshot: `outputs/env.json`
+- Environment snapshot: `outputs/{BIKE_LEVEL}_env.json`
 - Processed data: `data/processed/{BIKE_LEVEL}_processed.csv`
-- Peak hours: `outputs/peak_hours.csv` + `outputs/peak_hours_summary.txt`
-- Summary table: `outputs/summary.csv`
-- Baseline metrics: `outputs/metrics.txt`
-- Model comparison: `outputs/model_comparison.csv`
-- Figures: `outputs/fig_*.png`
+- Peak hours: `outputs/{BIKE_LEVEL}_peak_hours.csv` + `outputs/{BIKE_LEVEL}_peak_hours_summary.txt`
+- Summary table: `outputs/{BIKE_LEVEL}_summary.csv`
+- Baseline metrics: `outputs/{BIKE_LEVEL}_metrics.txt`
+- Model comparison: `outputs/{BIKE_LEVEL}_model_comparison.csv`
+- Figures: `outputs/{BIKE_LEVEL}_fig_*.png`
 """,
         encoding="utf-8",
     )
 
     # --- 8) Quick check / logging ---
     generated = [
-        "outputs/env.json",
-        "outputs/metrics.txt",
-        "outputs/model_comparison.csv",
-        "outputs/summary.csv",
-        "outputs/peak_hours.csv",
-        "outputs/peak_hours_summary.txt",
-        "outputs/fig_heatmap_month_hour.png",
-        "outputs/fig_timeseries.png",
-        "outputs/fig_temp_vs_cnt.png",
-        "outputs/fig_avg_by_hour.png",
-        "outputs/fig_avg_by_hour_daytype.png",
-        "reports/REPORT.md",
+        f"outputs/{BIKE_LEVEL}_metrics.txt",
+        f"outputs/{BIKE_LEVEL}_model_comparison.csv",
+        f"outputs/{BIKE_LEVEL}_summary.csv",
+        f"outputs/{BIKE_LEVEL}_peak_hours.csv",
+        f"outputs/{BIKE_LEVEL}_peak_hours_summary.txt",
+        f"outputs/{BIKE_LEVEL}_fig_heatmap_month_hour.png",
+        f"outputs/{BIKE_LEVEL}_fig_timeseries.png",
+        f"outputs/{BIKE_LEVEL}_fig_temp_vs_cnt.png",
+        f"outputs/{BIKE_LEVEL}_fig_avg_by_hour.png",
+        f"outputs/{BIKE_LEVEL}_fig_avg_by_hour_daytype.png",
+        f"reports/{BIKE_LEVEL}_REPORT.md",
         f"data/processed/{BIKE_LEVEL}_processed.csv",
     ]
     missing = [p for p in generated if not Path(p).exists()]
     if missing:
-        print("WARNING: some expected artefacts were not found:")
+        print(f"WARNING: some expected artefacts for '{BIKE_LEVEL}' were not found:")
         for p in missing:
             print(" -", p)
     else:
-        print("OK ✅ Pipeline executed.")
+        print(f"OK ✅ Pipeline executed for level: {BIKE_LEVEL}.")
         print("Check: outputs/, reports/, data/processed/")
 
 

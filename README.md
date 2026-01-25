@@ -29,6 +29,7 @@ This script automatically:
 2. Creates a local virtual environment (`.venv` or `.venv-win`).
 3. Installs dependencies from `requirements.lock`.
 4. Runs the analysis pipeline.
+5. Launches the **Streamlit dashboard** to visualize the results.
 
 ## Outputs (generated)
 - `outputs/metrics.txt` (RMSE / R²)
@@ -38,6 +39,7 @@ This script automatically:
 - `outputs/fig_temp_vs_cnt.png` (temperature vs demand)
 - `outputs/fig_avg_by_hour.png` (average rentals by hour)
 - `reports/REPORT.md` (short human-readable report)
+- **Streamlit Dashboard**: A browser-based interactive view of all above.
 
 ## Notes
 - Default is **hour-level** (`hour.csv`). If you want day-level instead:

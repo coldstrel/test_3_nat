@@ -63,7 +63,28 @@ def install_requirements() -> None:
 
 
 def run_pipeline() -> None:
-    subprocess.check_call([str(venv_python()), "src/pipeline.py"], cwd=ROOT)
+    # Run for both levels if not specified
+    levels = ["hour", "day"]
+    env_level = os.getenv("BIKE_LEVEL")
+    if env_level:
+        levels = [env_level.strip().lower()]
+
+    for level in levels:
+        print(f"--- Running pipeline for level: {level} ---")
+        env = os.environ.copy()
+        env["BIKE_LEVEL"] = level
+        subprocess.check_call([str(venv_python()), "src/pipeline.py"], cwd=ROOT, env=env)
+
+
+def run_streamlit() -> None:
+    print("--- Launching Streamlit app ---")
+    # Using Popen or check_call? If it's the last thing, check_call is fine.
+    # However, sometimes users want to run it in the background.
+    # The user said "after that open the streamlit app", implying sequential.
+    try:
+        subprocess.check_call([str(venv_python()), "-m", "streamlit", "run", "app.py"], cwd=ROOT)
+    except KeyboardInterrupt:
+        print("\n--- Streamlit stopped by user ---")
 
 
 def find_compatible_python() -> str:
@@ -102,6 +123,7 @@ def main() -> None:
     
     if not args.install_only:
         run_pipeline()
+        run_streamlit()
 
 
 if __name__ == "__main__":
