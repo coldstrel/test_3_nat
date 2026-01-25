@@ -8,8 +8,9 @@ This repo is a small **Reproducible Analytical Pipeline (RAP)** that:
 5) writes **outputs** (tables + figures + a short report).
 
 ## One-command run
+Linux/macOS/WSL:
 ```bash
-python run.py
+./run.sh
 ```
 This creates a local virtualenv, installs `requirements.txt`, runs the pipeline,
 and starts Streamlit in the background.
@@ -21,12 +22,12 @@ run.cmd
 
 ## Streamlit app
 ```bash
-python run.py --streamlit
+streamlit run app.py
 ```
 
-Or run directly:
+Or on Linux/macOS/WSL with venv:
 ```bash
-streamlit run app.py
+./run_streamlit.sh
 ```
 
 ## Outputs (generated)
@@ -41,6 +42,6 @@ streamlit run app.py
 ## Notes
 - Default is **hour-level** (`hour.csv`). If you want day-level instead:
   ```bash
-  BIKE_LEVEL=day python run.py
+  BIKE_LEVEL=day ./run.sh
   ```
 - Downloaded data is stored in `data/raw/` (not committed).
