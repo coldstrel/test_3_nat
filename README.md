@@ -15,6 +15,11 @@ Linux/macOS/WSL:
 This creates a local virtualenv, installs `requirements.txt`, runs the pipeline,
 and starts Streamlit in the background.
 
+If you are on WSL and see a `bash\r` error, run:
+```bash
+./run_wsl.sh
+```
+
 Windows (PowerShell or CMD):
 ```bat
 run.cmd
