@@ -14,18 +14,11 @@ if [ -z "$PYTHON_BIN" ]; then
   exit 1
 fi
 
-if [ ! -d ".venv" ]; then 
+if [ ! -d ".venv" ]; then
   "$PYTHON_BIN" -m venv .venv
 fi
 
 source .venv/bin/activate
 pip install -r requirements.txt
 
-python src/pipeline.py
-
-echo "OK ✅ Pipeline executed."
-echo "Starting Streamlit in background..."
-nohup streamlit run app.py >/tmp/streamlit.log 2>&1 &
-echo "Streamlit log: /tmp/streamlit.log"
-echo "Open: http://localhost:8501"
-echo "Check: outputs/, reports/, data/processed/"
+streamlit run app.py

@@ -40,6 +40,8 @@ from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
+ROOT = Path(__file__).resolve().parent
+sys.path.insert(0, str(ROOT))
 from utils import ensure_ucibike_data
 
 
