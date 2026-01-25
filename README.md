@@ -9,13 +9,13 @@ This repo is a small **Reproducible Analytical Pipeline (RAP)** that:
 
 ## One-command run
 ```bash
-./run.sh
+python run.py
 ```
-`run.sh` runs the pipeline using a local virtualenv and `pip install -r requirements.txt`.
+This creates a local virtualenv and installs `requirements.txt`.
 
 ## Streamlit app
 ```bash
-./run_streamlit.sh
+python run.py --streamlit
 ```
 
 Or run directly:
