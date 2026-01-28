@@ -9,15 +9,6 @@ This repo is a small **Reproducible Analytical Pipeline (RAP)** that:
 
 ## Reproducibility
 - **Python Version**: Specified in `.python-version` (pinned to 3.12.7). Supports Python 3.10 to 3.13.
-- **Dependencies**: Locked in `requirements.lock` for exact environments.
-- **Makefile**: Provides a standard interface for reproducibility on Unix systems.
-
-## Quick Start (Unix/macOS/WSL)
-If you have `make` installed:
-```bash
-make
-```
-This will install dependencies, run the pipeline for both 'hour' and 'day' levels, and launch the dashboard.
 
 ## One-command run (All Platforms)
 If you don't have `make` or are on Windows:
