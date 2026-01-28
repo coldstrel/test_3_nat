@@ -69,26 +69,7 @@ This command will:
 
 Open your browser and navigate to:
 
-```
-http://localhost:8501
-```
-
-## Project Structure
-
-```
-bike-rap-peak-hours/
-├── app.py                 # Streamlit dashboard application
-├── run.py                 # Main pipeline orchestrator
-├── src/
-│   ├── pipeline.py        # Core pipeline logic
-│   └── utils.py           # Helper functions
-├── tests/
-│   └── test_smoke.py      # Basic smoke tests
-├── Dockerfile             # Container definition
-├── requirements.txt       # Python dependencies
-├── pyproject.toml         # Project configuration
-└── .python-version        # Python version specification
-```
+[http://localhost:8501](http://localhost:8501)
 
 ## Reproducibility
 
@@ -119,7 +100,3 @@ After running the pipeline, you'll find:
 - **`outputs/`**: Generated charts and visualizations
 - **`reports/`**: Analytical reports and summary statistics
 - **`processed_data/`**: Cleaned and transformed datasets
-
-## License
-
-This project uses the UCI Bike Sharing Dataset, which is publicly available for research purposes.
